@@ -56,7 +56,7 @@ def generer_historique_et_ia(ticker, prix_base):
     
     return df_hist.dropna(), prix_actuel, prix_predit, variation, signal
 
-# Fonction pour dessiner le graphique SVG interactif sans dépendance externe
+# Fonction pour dessiner le graphique SVG interactif
 def afficher_graphique_svg(df_plot, nom_action):
     prix_vals = df_plot['Prix'].tolist()
     ma_vals = df_plot['MA20'].tolist()
@@ -92,21 +92,17 @@ def afficher_graphique_svg(df_plot, nom_action):
             </div>
         </div>
         <svg viewBox="0 0 {width} {height}" style="width: 100%; height: auto;">
-            <!-- Grille horizontale -->
             <line x1="{pad_left}" y1="{pad_top}" x2="{width-pad_right}" y2="{pad_top}" stroke="#eee" />
             <line x1="{pad_left}" y1="{pad_top + plot_h/2}" x2="{width-pad_right}" y2="{pad_top + plot_h/2}" stroke="#eee" />
             <line x1="{pad_left}" y1="{height-pad_bottom}" x2="{width-pad_right}" y2="{height-pad_bottom}" stroke="#ccc" />
             
-            <!-- Labels Y -->
             <text x="{pad_left-10}" y="{pad_top+5}" font-size="11" text-anchor="end" fill="#666">{max_val:.2f} DT</text>
             <text x="{pad_left-10}" y="{pad_top + plot_h/2 + 4}" font-size="11" text-anchor="end" fill="#666">{(min_val+max_val)/2:.2f} DT</text>
             <text x="{pad_left-10}" y="{height-pad_bottom}" font-size="11" text-anchor="end" fill="#666">{min_val:.2f} DT</text>
             
-            <!-- Labels X -->
-            <text x="{pad_left}" y="{height-15}" font-size="11" text-anchor="start" fill="#666">{dates_str}</text>
+            <text x="{pad_left}" y="{height-15}" font-size="11" text-anchor="start" fill="#666">{dates_str[0]}</text>
             <text x="{width-pad_right}" y="{height-15}" font-size="11" text-anchor="end" fill="#666">{dates_str[-1]}</text>
             
-            <!-- Courbes -->
             <polyline fill="none" stroke="#ff7f0e" stroke-width="2.5" stroke-dasharray="6,4" points="{pts_ma}" />
             <polyline fill="none" stroke="#1f77b4" stroke-width="2.5" points="{pts_prix}" />
         </svg>
@@ -158,7 +154,7 @@ elif page_choisie == "🔮 Prédictions IA":
     historiques_sauvegardes = {}
     
     for t in tickers_autorises:
-        nom_entreprise = df_bourse[df_bourse['Ticker'] == t]['Nom'].iloc
+        nom_entreprise = df_bourse[df_bourse['Ticker'] == t]['Nom'].iloc[0]
         df_h, p_actuel, p_predit, var, sig = generer_historique_et_ia(t, prix_simulation[t])
         historiques_sauvegardes[nom_entreprise] = df_h
         resultats_ia.append({
@@ -186,7 +182,7 @@ elif page_choisie == "💰 Simulateur & Purification":
     action_choisie = st.selectbox("Sélectionnez une action conforme :", 
                                  df_bourse[df_bourse['Statut_Sharia'] == "🟢 CONFORME (Halal)"]['Nom'])
 
-    infos_action = df_bourse[df_bourse['Nom'] == action_choisie].iloc
+    infos_action = df_bourse[df_bourse['Nom'] == action_choisie].iloc[0]
     montant_investi = st.number_input("Somme initiale à investir (en DT) :", min_value=100, max_value=100000, value=1000, step=100)
 
     dividende_estime = montant_investi * 0.06
